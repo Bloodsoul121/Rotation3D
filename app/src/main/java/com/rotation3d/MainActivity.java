@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,12 +54,34 @@ public class MainActivity extends AppCompatActivity {
         ObjectAnimator scaleYAnim = ObjectAnimator.ofFloat(mCardIv, "scaleY", 0.6f, 1f);
         scaleYAnim.setDuration(300);
 
-        ObjectAnimator rotation3DBackAnim1 = ObjectAnimator.ofFloat(mCardIv, "rotationY", 0f, -13f);
-        rotation3DBackAnim1.setDuration(300);
-        ObjectAnimator rotation3DBackAnim2 = ObjectAnimator.ofFloat(mCardIv, "rotationY", -13f, 90f);
-        rotation3DBackAnim2.setDuration(500);
-        ObjectAnimator rotation3DFrontAnim = ObjectAnimator.ofFloat(mCardIv, "rotationY", -90f, 0f);
-        rotation3DFrontAnim.setDuration(400);
+//        ObjectAnimator rotation3DBackAnim1 = ObjectAnimator.ofFloat(mCardIv, "rotationY", 0f, -13f);
+//        rotation3DBackAnim1.setDuration(300);
+//        ObjectAnimator rotation3DBackAnim2 = ObjectAnimator.ofFloat(mCardIv, "rotationY", -13f, 90f);
+//        rotation3DBackAnim2.setDuration(500);
+//        ObjectAnimator rotation3DFrontAnim = ObjectAnimator.ofFloat(mCardIv, "rotationY", -90f, 0f);
+//        rotation3DFrontAnim.setDuration(400);
+
+        ValueAnimator rotation3DBackAnim = ValueAnimator.ofInt(0, 1200);
+        rotation3DBackAnim.setDuration(1200);
+        rotation3DBackAnim.setInterpolator(new LinearInterpolator());
+        rotation3DBackAnim.addUpdateListener(animation -> {
+            int time = (int) animation.getAnimatedValue();
+            float rotationY = 0f;
+            if (time <= 300) {
+                rotationY = -13f / 300f * time;
+            } else if (time <= 800) {
+                float duration = time - 300f;
+                rotationY = -13f + 103f / 500f * duration;
+            } else if (time <= 1200) {
+                float duration = time - 800f;
+                rotationY = -90f + 90f / 400f * duration;
+            }
+            mCardIv.setRotationY(rotationY);
+
+            if (time > 800) {
+                mCardIv.setImageResource(R.drawable.sign_in_gold_card_front_big);
+            }
+        });
 
         ObjectAnimator alphaAnimRadiance1 = ObjectAnimator.ofFloat(mRadianceIv, "alpha", 0f, 1f);
         alphaAnimRadiance1.setDuration(400);
@@ -80,12 +104,12 @@ public class MainActivity extends AppCompatActivity {
         ObjectAnimator rotationAnimGiftNum2 = ObjectAnimator.ofFloat(mBigCardGiftNumTv, "alpha", 1f, 0f);
         rotationAnimGiftNum2.setDuration(300);
 
-        rotation3DFrontAnim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                mCardIv.setImageResource(R.drawable.sign_in_gold_card_front_big);
-            }
-        });
+//        rotation3DFrontAnim.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//                mCardIv.setImageResource(R.drawable.sign_in_gold_card_front_big);
+//            }
+//        });
 
         mAnimatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -107,9 +131,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mAnimatorSet.playTogether(alphaAnimCard1, scaleXAnim, scaleYAnim);
-        mAnimatorSet.play(rotation3DBackAnim1).after(alphaAnimCard1);
-        mAnimatorSet.play(rotation3DBackAnim2).after(rotation3DBackAnim1);
-        mAnimatorSet.play(rotation3DFrontAnim).after(rotation3DBackAnim2);
+        mAnimatorSet.play(rotation3DBackAnim).after(alphaAnimCard1);
+//        mAnimatorSet.play(rotation3DBackAnim2).after(rotation3DBackAnim1);
+//        mAnimatorSet.play(rotation3DFrontAnim).after(rotation3DBackAnim2);
         mAnimatorSet.play(alphaAnimRadiance1);
         mAnimatorSet.play(alphaAnimRadiance2).with(alphaAnimCard2);
         mAnimatorSet.play(rotationAnimRadiance);
